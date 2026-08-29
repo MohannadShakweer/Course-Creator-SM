@@ -114,7 +114,7 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 body{
   margin:0;
   font-family:var(--font-body);
@@ -124,7 +124,6 @@ body{
   background:var(--bg);
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
-  overflow-x:hidden;
   transition:background-color .3s ease,color .3s ease;
 }
 h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);line-height:1.18;letter-spacing:-.01em;margin:0}
@@ -502,16 +501,22 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 
 .grid-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;min-height:24px}
 
-.view-toggle{display:inline-flex;gap:3px;background:var(--surface-2);border:1px solid var(--line-strong);padding:3px;border-radius:99px;flex:none}
+/* Grid/Stack switch — spelled out in words (not icon-only) so it's
+   obvious at a glance which layout is currently showing, plus a strong
+   fill + glow on whichever one is active. */
+.view-toggle{display:inline-flex;gap:4px;background:var(--surface-2);border:1px solid var(--line-strong);padding:4px;border-radius:99px;flex:none}
 .vtbtn{
-  display:grid;place-items:center;width:32px;height:32px;border-radius:99px;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 13px 7px 10px;border-radius:99px;
   color:var(--faint);cursor:pointer;
-  transition:color .15s,background-color .15s;
+  font-size:12.5px;font-weight:700;letter-spacing:.01em;white-space:nowrap;
+  transition:color .15s,background-color .15s,box-shadow .15s,transform .15s;
 }
-.vtbtn svg.ic{width:16px;height:16px}
+.vtbtn svg.ic{width:15px;height:15px}
 .vtbtn:hover{color:var(--ink)}
-.vtbtn.active{background:var(--accent);color:#fff}
-#gridLabel{font-size:13px;font-weight:600;color:var(--faint);letter-spacing:.02em}
+.vtbtn.active{background:var(--accent);color:#fff;box-shadow:0 6px 16px -6px rgba(124,58,237,.6)}
+#gridLabel{font-size:13px;font-weight:600;color:var(--faint);letter-spacing:.02em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:420px){.vtbtn-label{display:none}.vtbtn{padding:8px}}
 
 .bento-wrap{
   position:relative;isolation:isolate;overflow:hidden;
@@ -807,6 +812,7 @@ body.focus-mode .mobile-cta{display:none !important}
 
 body.focus-mode .nav-links{display:none}                
 body.focus-mode .brand{visibility:hidden}               
+body.focus-mode .nav-actions{display:none}
 
 body.focus-mode .library{padding-block:34px 60px}
 
@@ -829,6 +835,10 @@ body.focus-mode .library{padding-block:34px 60px}
 .back-overview svg.ic{width:17px;height:17px}
 
 body:not(.focus-mode) .back-overview{display:none}
+.back-overview-inline{margin-bottom:18px}
+@media (max-width:600px){
+  .back-overview-inline{display:flex;width:100%;justify-content:center;text-align:center}
+}
 
 @media (max-width:600px){
   body.focus-mode .topbar-inner{
@@ -839,17 +849,14 @@ body:not(.focus-mode) .back-overview{display:none}
   body.focus-mode .brand{display:none}
   body.focus-mode .nav-search{grid-area:search;min-width:0}
   body.focus-mode .nav-actions{grid-area:actions;flex-wrap:wrap;justify-content:center;gap:8px}
-  
-  body.focus-mode .nav-actions .icon-btn{display:none}
-  body.focus-mode .back-overview{flex:1 1 60%;justify-content:center;min-width:0;padding:10px 10px;font-size:13px}
-  body.focus-mode .nav-cta{flex:1 1 39%;justify-content:center;min-width:0;padding:8px 8px;font-size:12px}
+
+  body.focus-mode .nav-cta{flex:1 1 100%;justify-content:center;min-width:0;padding:10px 10px;font-size:13px}
 }
 
-@media (max-width:480px){
-  body.focus-mode .nav-actions{flex-direction:column;gap:8px}
-  body.focus-mode .back-overview,
-  body.focus-mode .nav-cta{max-width:100%;width:100%}
-}
+/* Demo page (focus-mode, including reading a lesson): the theme
+   toggle and "Send Me Your Files" are hidden entirely — only the
+   "back" links (Back to overview / Back to library, inside the page
+   content) remain, scrolling normally with the rest of the page. */
 
 .resource-body.enter{animation:pageIn .45s cubic-bezier(.2,.7,.2,1)}
 @keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1553,10 +1560,6 @@ body:not(.focus-mode) .back-overview{display:none}
     </nav>
 
     <div class="nav-actions">
-      <a class="back-overview" id="backOverview" href="#hero" role="button">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Back to overview
-      </a>
       <button class="icon-btn" id="themeToggle" role="switch" aria-checked="false" aria-label="Toggle dark mode" title="Toggle dark mode">
         <span class="tt-icon tt-moon" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
         <span class="tt-icon tt-sun" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
@@ -1659,6 +1662,15 @@ body:not(.focus-mode) .back-overview{display:none}
        DEMO LIBRARY — the live, working interactive course
        ============================================================ -->
   <section class="section library landing" id="library">
+    <!-- "Back to overview" lives here now (not in the sticky topbar) so it
+         scrolls away with the rest of the library content on mobile,
+         instead of staying pinned at the top while browsing. -->
+    <div class="container">
+      <a class="back-overview back-overview-inline" id="backOverview" href="#hero" role="button">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to overview
+      </a>
+    </div>
     <!-- Focus-mode context banner: the SAME example-note, relocated here
          (sticky above the grid while Focus Mode is on) -->
     <div class="container">
@@ -1726,11 +1738,13 @@ body:not(.focus-mode) .back-overview{display:none}
       <div class="grid-meta">
         <span id="gridLabel">Photography example course — 12 items</span>
         <div class="view-toggle" id="viewToggle" role="group" aria-label="Switch layout">
-          <button class="vtbtn active" data-view="grid" aria-pressed="true" title="Grid view" aria-label="Grid view">
+          <button class="vtbtn" data-view="grid" aria-pressed="false" title="Grid view" aria-label="Grid view">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <span class="vtbtn-label">Grid</span>
           </button>
-          <button class="vtbtn" data-view="stack" aria-pressed="false" title="Stack view" aria-label="Stack view">
+          <button class="vtbtn active" data-view="stack" aria-pressed="true" title="Stack view" aria-label="Stack view">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="11" height="15" rx="2" transform="rotate(-8 10.5 10.5)"/><rect x="7" y="4" width="11" height="15" rx="2" transform="rotate(6 12.5 11.5)"/></svg>
+            <span class="vtbtn-label">Stack</span>
           </button>
         </div>
       </div>
@@ -3737,7 +3751,7 @@ function initFilterBar(){
 
 /* Grid / Stack layout toggle — purely a display preference, shares the
    same RESOURCES + activeFilter as the grid above. */
-let activeView = 'grid';
+let activeView = 'stack';  /* Stack is the default layout on first load */
 function setView(v){
   if(v === activeView) return;
   activeView = v;
@@ -3925,7 +3939,8 @@ function openResource(r){
   updateMobileCta();
   const t = $('.rz-title', body);
   if(t){ t.setAttribute('tabindex', '-1'); t.focus({ preventScroll:true }); }
-  const navCta = $('#navCta'); if(navCta){ navCta.textContent = 'Back to library'; navCta.setAttribute('href', '#library'); }
+  /* nav-cta stays "Send Me Your Files" and pinned — the resource's own
+     "Back to library" link (in .resource-top) is what scrolls with the page. */
 }
 
 function closeResource(id){
@@ -4333,6 +4348,38 @@ function setNiche(id){
   }
 }
 
+/* Mobile hardware/gesture back button:
+   - Inside the demo (a lesson open, or browsing the library), the
+     phone's back button already works correctly on its own — every
+     hash change (opening a lesson, closing it, entering/leaving
+     Focus Mode) is a real browser-history entry, so back just steps
+     to the previous one, same as any link.
+   - The only gap is the very first back press once the visitor is
+     back at the true starting point (no lesson open, Focus Mode
+     off): that back press would normally leave the page entirely
+     with no warning. We inject one extra "guard" history entry so
+     that press is caught instead, show a "press back again to
+     exit" toast, and only let the *next* back press actually leave. */
+let backExitArmed = false, backExitTimer = null;
+function armBackExitGuard(){
+  try{ history.pushState({icpdGuard:true}, '', location.href); }catch(e){}
+}
+function initBackExitGuard(){
+  armBackExitGuard();
+  window.addEventListener('popstate', function(){
+    const atRoot = (location.hash === '' || location.hash === '#hero')
+      && !document.body.classList.contains('focus-mode')
+      && !document.body.classList.contains('route-open');
+    if(!atRoot) return;  /* still inside the demo — let route() via hashchange handle it normally */
+    if(backExitArmed) return;  /* second press at the root: let this one actually exit */
+    backExitArmed = true;
+    toast('Press back again to exit');
+    armBackExitGuard();
+    clearTimeout(backExitTimer);
+    backExitTimer = setTimeout(function(){ backExitArmed = false; }, 2000);
+  });
+}
+
 function init(){
   $('#year').textContent = new Date().getFullYear();
   initTheme();
@@ -4397,6 +4444,7 @@ function init(){
 
   route(); /* supports deep links like file.html#quiz */
   ensureCardsVisible();
+  initBackExitGuard();
 }
 init();
 </script>
