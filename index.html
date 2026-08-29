@@ -28,14 +28,15 @@
       localStorage where available, and silently skips it where not.
   ============================================================================
 -->
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PDF to Interactive Course — Live Demo</title>
 <meta name="description" content="Your PDFs already contain the course. This working demo shows them converted into a searchable, interactive, offline learning experience — no LMS required.">
+<meta name="theme-color" content="#0c0414">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f6fa">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0c11">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0414">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c3aed' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M14.31 8l5.74 9.94'/%3E%3Cpath d='M9.69 8h11.48'/%3E%3Cpath d='M7.38 12l5.74-9.94'/%3E%3Cpath d='M9.69 16L3.95 6.06'/%3E%3Cpath d='M14.31 16H2.83'/%3E%3Cpath d='M16.62 12l-5.74 9.94'/%3E%3C/svg%3E">
 <!-- Fonts: loaded from CDN once, then cached. CSS defines offline-safe fallbacks. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -84,23 +85,24 @@
 
   --r-lg:18px; --r-md:13px; --r-sm:9px;
   --topbar-h:64px;
+  --ink-rgb:23,23,30;
   color-scheme:light;
 }
 [data-theme="dark"]{
-  --bg:#0c0c11;
-  --surface:#15151d;
-  --surface-2:#1b1b26;
-  --ink:#f1f1f6;
-  --body-c:#c9c9d6;
-  --muted:#9c9cae;
-  --faint:#6d6d80;
-  --line:#262633;
-  --line-strong:#383846;
+  --bg:#0c0414;
+  --surface:#150f1e;
+  --surface-2:#1c1428;
+  --ink:#f4dfff;
+  --body-c:#d3c4e0;
+  --muted:#a396b3;
+  --faint:#766a86;
+  --line:#2a2138;
+  --line-strong:#3a2e4d;
 
-  --accent:#8b5cf6;
-  --accent-2:#c084fc;
+  --accent:#c069ff;
+  --accent-2:#a855f7;
   --accent-soft:#221a38;
-  --accent-soft-2:rgba(139,92,246,.16);
+  --accent-soft-2:rgba(192,105,255,.18);
 
   --ok:#3ecf8e; --ok-strong:#34d399; --ok-soft:rgba(52,211,153,.12);
   --bad:#f87171; --bad-soft:rgba(248,113,113,.12);
@@ -110,11 +112,52 @@
 
   --shadow-1:0 1px 2px rgba(0,0,0,.3),0 12px 32px -14px rgba(0,0,0,.5);
   --shadow-2:0 2px 6px rgba(0,0,0,.35),0 26px 52px -20px rgba(0,0,0,.6);
+  --ink-rgb:244,223,255;
   color-scheme:dark;
 }
 
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:hidden}
+
+/* ============================================================
+   SITE-WIDE COSMIC BACKGROUND — Midnight Teal + Purple.
+   Fixed behind the entire product (not just the hero), so every
+   section shares the same backdrop as you scroll. Two pseudo-
+   elements on body: ::before = gradient + breathing glow blobs,
+   ::after = twinkling star field. Both are negative z-index and
+   fixed, so normal content (z-index:auto) always paints on top.
+   Hidden entirely in light mode.
+   ============================================================ */
+body::before{
+  content:"";position:fixed;inset:-10%;z-index:-2;pointer-events:none;
+  background:
+    linear-gradient(150deg,#071a1c 0%,#0c0414 55%,#170a24 100%),
+    radial-gradient(650px 650px at 12% 10%,rgba(20,130,130,.30),transparent 60%),
+    radial-gradient(600px 600px at 88% 6%,rgba(192,105,255,.26),transparent 60%),
+    radial-gradient(760px 520px at 50% 100%,rgba(15,110,115,.22),transparent 65%);
+  animation:heroGlowPulse 11s ease-in-out infinite;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background-image:
+    radial-gradient(2px 2px at 10% 15%,rgba(192,105,255,.9),transparent 60%),
+    radial-gradient(2px 2px at 82% 12%,rgba(45,212,191,.9),transparent 60%),
+    radial-gradient(1.6px 1.6px at 62% 65%,rgba(192,105,255,.8),transparent 60%),
+    radial-gradient(1.6px 1.6px at 22% 68%,rgba(45,212,191,.8),transparent 60%),
+    radial-gradient(1.6px 1.6px at 46% 32%,rgba(192,105,255,.75),transparent 60%),
+    radial-gradient(1.6px 1.6px at 92% 55%,rgba(45,212,191,.75),transparent 60%),
+    radial-gradient(1.4px 1.4px at 34% 88%,rgba(192,105,255,.7),transparent 60%),
+    radial-gradient(1.4px 1.4px at 70% 90%,rgba(45,212,191,.7),transparent 60%);
+  animation:heroStarTwinkle 4.5s ease-in-out infinite;
+}
+[data-theme="light"] body::before,[data-theme="light"] body::after{display:none}
+@media (prefers-reduced-motion: reduce){ body::before,body::after{animation:none} }
+@media (max-width:820px){
+  /* continuous full-viewport animations are the single heaviest cost
+     on mobile GPUs — keep the static backdrop, drop the looping
+     pulse/twinkle so the compositor isn't repainting every frame */
+  body::before,body::after{animation:none}
+}
 body{
   margin:0;
   font-family:var(--font-body);
@@ -173,6 +216,29 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 .btn-ghost{background:var(--surface);color:var(--ink);border-color:var(--line-strong);box-shadow:0 1px 2px rgba(23,23,30,.05)}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
 .btn-lg{padding:14px 26px;font-size:15.5px;border-radius:13px}
+
+/* "See the Demo" — the one action everything else should defer to.
+   Deliberately a different color family (warm amber) from the purple
+   accent used everywhere else, plus extra size and a soft breathing
+   glow, so it reads as *the* button on the page. */
+.btn-demo{
+  background:linear-gradient(135deg,#ffc352,#ff7a18);
+  color:#241102;
+  font-weight:800;
+  font-size:17px;
+  padding:17px 34px;
+  border-radius:14px;
+  box-shadow:0 16px 36px -10px rgba(255,122,24,.65),0 0 0 1px rgba(255,255,255,.18) inset;
+  animation:demoPulse 2.6s ease-in-out infinite;
+}
+.btn-demo svg.ic{width:19px;height:19px}
+.btn-demo:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 20px 44px -8px rgba(255,122,24,.8),0 0 0 1px rgba(255,255,255,.22) inset;filter:saturate(1.08)}
+.btn-demo:active{transform:translateY(0) scale(1)}
+@keyframes demoPulse{
+  0%,100%{box-shadow:0 16px 36px -10px rgba(255,122,24,.5),0 0 0 1px rgba(255,255,255,.18) inset}
+  50%{box-shadow:0 20px 48px -6px rgba(255,122,24,.85),0 0 0 1px rgba(255,255,255,.22) inset}
+}
+@media (prefers-reduced-motion: reduce){ .btn-demo{animation:none} }
 .btn-sm{padding:8px 15px;min-height:40px;font-size:13.5px;border-radius:10px}
 
 .type-chip{
@@ -190,13 +256,16 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 
 .topbar{
   position:sticky;top:0;z-index:100;
-  background:rgba(246,246,250,.82);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  background:rgba(246,246,250,.96);
   border-bottom:1px solid transparent;
   transition:border-color .25s,box-shadow .25s;
 }
-[data-theme="dark"] .topbar{background:rgba(12,12,17,.82)}
+[data-theme="dark"] .topbar{background:rgba(12,12,17,.96)}
 .topbar.scrolled{border-bottom-color:var(--line);box-shadow:0 8px 26px -20px rgba(23,23,30,.35)}
+@media (min-width:901px){
+  .topbar{background:rgba(246,246,250,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  [data-theme="dark"] .topbar{background:rgba(12,12,17,.82)}
+}
 .topbar-inner{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:16px;height:var(--topbar-h)}
 
 .brand{display:inline-flex;align-items:center;gap:10px;color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:-.01em}
@@ -320,6 +389,60 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
   mask-image:linear-gradient(#000 8%,transparent 68%);
 }
 [data-theme="dark"] .hero::after{opacity:.3}
+
+/* ============================================================
+   HERO — cosmic background, dark-mode only. Scoped to
+   [data-theme="dark"] so toggling to light mode fully reverts
+   the hero to its own light styling below — no half-dark leftovers.
+   Overriding the tokens here means every existing hero element
+   (title, buttons, chips, badges) repaints correctly through the
+   normal var(--...) cascade — nothing else needed to touch.
+   ============================================================ */
+[data-theme="dark"] .hero{
+  --ink:#F4DFFF; --body-c:#E4D4F5;
+  --muted:rgba(244,223,255,.7); --faint:rgba(244,223,255,.5);
+  --line:rgba(255,255,255,.12); --line-strong:rgba(255,255,255,.22);
+  --surface:rgba(255,255,255,.05); --surface-2:rgba(255,255,255,.09);
+  --accent:#c069ff; --accent-2:#a855f7; --accent-ink:#ffffff;
+  --accent-soft:rgba(192,105,255,.16); --accent-soft-2:rgba(192,105,255,.24);
+  background:linear-gradient(150deg,#071a1c 0%,#0c0414 55%,#170a24 100%);
+}
+[data-theme="dark"] .hero::before{
+  background:
+    radial-gradient(680px 600px at 14% -10%,rgba(20,130,130,.32),transparent 62%),
+    radial-gradient(560px 540px at 88% -4%,rgba(192,105,255,.32),transparent 62%),
+    radial-gradient(820px 460px at 50% 118%,rgba(15,110,115,.28),transparent 70%);
+  animation:heroGlowPulse 8s ease-in-out infinite;
+}
+[data-theme="dark"] .hero::after{background-image:radial-gradient(rgba(255,255,255,.55) 1px,transparent 1.4px);opacity:.35}
+@keyframes heroGlowPulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.85;transform:scale(1.06)}}
+
+/* the reference-matched orbs + star field are a dark-mode effect;
+   light mode keeps its own quieter soft-glow hero (defined above) */
+[data-theme="light"] .hero-orb,[data-theme="light"] .hero-stars{display:none}
+.hero-orb{position:absolute;pointer-events:none;border-radius:50%;mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(192,105,255,.55),transparent 70%);filter:blur(60px)}
+.hero-orb.o1{width:340px;height:340px;left:6%;top:-90px;background:radial-gradient(circle,rgba(45,212,191,.5),transparent 70%);animation:heroOrbFloat 7s ease-in-out infinite}
+.hero-orb.o2{width:260px;height:260px;right:4%;top:-50px;animation:heroOrbFloat 5.5s ease-in-out infinite .6s}
+.hero-orb.o3{width:220px;height:220px;left:44%;top:110px;opacity:.6;background:radial-gradient(circle,rgba(20,184,166,.45),transparent 70%);animation:heroOrbFloat 6.5s ease-in-out infinite 1.2s}
+@keyframes heroOrbFloat{0%,100%{transform:translateY(0) scale(1);opacity:.55}50%{transform:translateY(14px) scale(1.12);opacity:.9}}
+
+.hero-stars{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hero-stars i{position:absolute;width:2px;height:2px;border-radius:50%;font-style:normal;
+  background:#c069ff;box-shadow:0 0 6px 1px rgba(192,105,255,.9);animation:heroStarTwinkle 2.6s ease-in-out infinite}
+.hero-stars i:nth-child(1){left:10%;top:14%;animation-delay:.1s}
+.hero-stars i:nth-child(2){left:20%;top:38%;animation-delay:.9s;background:#2dd4bf;box-shadow:0 0 6px 1px rgba(45,212,191,.9)}
+.hero-stars i:nth-child(3){left:33%;top:10%;animation-delay:.4s}
+.hero-stars i:nth-child(4){left:58%;top:18%;animation-delay:1.3s;background:#2dd4bf;box-shadow:0 0 6px 1px rgba(45,212,191,.9)}
+.hero-stars i:nth-child(5){left:70%;top:40%;animation-delay:.2s}
+.hero-stars i:nth-child(6){left:84%;top:16%;animation-delay:1.6s}
+.hero-stars i:nth-child(7){left:91%;top:42%;animation-delay:.7s;background:#2dd4bf;box-shadow:0 0 6px 1px rgba(45,212,191,.9)}
+.hero-stars i:nth-child(8){left:5%;top:44%;animation-delay:1.1s}
+@keyframes heroStarTwinkle{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:1;transform:scale(1.8)}}
+
+@media (prefers-reduced-motion: reduce){
+  .hero::before,.hero-orb,.hero-stars i,.hero-badges li{animation:none !important}
+}
 .hero-inner{position:relative;max-width:880px;margin-inline:auto;text-align:center;display:flex;flex-direction:column;align-items:center}
 .hero-title{font-size:clamp(29px,4.8vw,52px);line-height:1.12;letter-spacing:-.025em;font-weight:700;margin:0 0 22px;max-width:840px}
 .hero-title .grad{display:block;font-size:.72em;margin-top:14px;line-height:1.22}
@@ -359,11 +482,29 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
   background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:7px 14px;
 }
 .hero-badges svg.ic{width:14px;height:14px;color:var(--accent)}
+.hero-badges li{animation:badgeFloat 3.4s ease-in-out infinite}
+.hero-badges li:nth-child(2){animation-delay:.25s}
+.hero-badges li:nth-child(3){animation-delay:.5s}
+.hero-badges li:nth-child(4){animation-delay:.75s}
+.hero-badges li:nth-child(5){animation-delay:1s}
+.hero-badges li:nth-child(6){animation-delay:1.25s}
+.hero-badges li:nth-child(7){animation-delay:1.5s}
+@keyframes badgeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 
-.ba-grid{display:grid;grid-template-columns:1fr 84px 1fr;align-items:stretch;gap:8px}
+.ba-slider{
+  position:relative;border-radius:var(--r-lg);overflow:hidden;
+  border:1px solid var(--line);min-height:560px;
+  cursor:ew-resize;user-select:none;touch-action:pan-y;
+  box-shadow:var(--shadow-1);
+}
+.ba-slider:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .ba-panel{
   position:relative;border-radius:var(--r-lg);padding:26px 26px 24px;
   background:var(--surface);border:1px solid var(--line);
+}
+.ba-slider .ba-panel{
+  position:absolute;inset:0;margin:0;border-radius:0;border:none;
+  overflow-y:auto;padding:78px 26px 24px;
 }
 .ba-label{
   display:inline-flex;align-items:center;gap:8px;
@@ -373,6 +514,7 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 .ba-label::before{content:"";width:7px;height:7px;border-radius:2px;background:currentColor}
 
 .ba-before{border-style:dashed;border-color:var(--line-strong)}
+.ba-slider .ba-before{background:var(--surface);z-index:2;will-change:clip-path}
 .ba-before .ba-label{color:var(--bad)}
 .file-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
 .file-row{
@@ -395,6 +537,7 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 .pain-tags li{font-size:12px;font-weight:600;color:var(--bad);background:var(--bad-soft);border-radius:99px;padding:5px 12px}
 
 .ba-after{border-color:rgba(124,58,237,.35);box-shadow:0 0 0 4px var(--accent-soft-2),var(--shadow-1)}
+.ba-slider .ba-after{background:var(--surface);z-index:1;box-shadow:none;direction:rtl;text-align:right}
 .ba-after .ba-label{color:var(--ok)}
 .mini-search{
   display:flex;align-items:center;gap:9px;
@@ -406,7 +549,7 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 .ms-caret{width:1.5px;height:15px;background:var(--accent);animation:blink 1.1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .mini-progress{margin-bottom:14px}
-.mp-bar{height:7px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden;margin-bottom:7px}
+.mp-bar{height:7px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden;margin-bottom:7px;display:flex;justify-content:flex-end}
 .mp-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
 .mini-progress span{font-size:12px;font-weight:600;color:var(--muted)}
 .mini-cards{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -427,16 +570,52 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 .gain-tags{list-style:none;display:flex;flex-wrap:wrap;gap:7px;padding:0;margin:0}
 .gain-tags li{font-size:12px;font-weight:600;color:var(--ok);background:var(--ok-soft);border-radius:99px;padding:5px 12px}
 
-.ba-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
-.ba-arrow-circle{
-  width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
-  display:grid;place-items:center;box-shadow:0 12px 26px -10px rgba(124,58,237,.6);
-  animation:arrowFloat 2.4s ease-in-out infinite;
+/* drag-to-compare overlay tags — pinned to the slider corners, not the clipped panel */
+.ba-tag{
+  position:absolute;top:16px;z-index:4;
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:22px;font-weight:900;letter-spacing:.03em;text-transform:uppercase;
+  padding:10px 20px;border-radius:99px;pointer-events:none;
+  box-shadow:0 10px 24px -8px rgba(0,0,0,.45);
 }
-.ba-arrow-circle svg.ic{width:22px;height:22px}
-@keyframes arrowFloat{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
-.ba-arrow-label{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.ba-tag::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.ba-tag-before{left:16px;color:#fff;background:var(--bad);transition:opacity .25s ease}
+.ba-tag-after{right:16px;color:#fff;background:var(--ok);transition:opacity .25s ease}
+
+/* draggable divider + handle */
+.ba-divider{
+  position:absolute;top:0;bottom:0;left:50%;width:4px;z-index:3;
+  background:#fff;transform:translateX(-50%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.1),0 0 18px rgba(0,0,0,.18);
+  pointer-events:none;
+}
+.ba-handle{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:46px;height:46px;border-radius:50%;
+  background:#fff;border:3px solid var(--accent);
+  display:grid;place-items:center;
+  box-shadow:0 10px 22px -8px rgba(124,58,237,.55);
+  transition:transform .15s ease;
+}
+.ba-slider.dragging .ba-handle{transform:translate(-50%,-50%) scale(1.12)}
+.ba-handle svg{width:18px;height:18px;color:var(--accent)}
+.ba-swipe-hint{
+  position:absolute;top:100%;left:50%;margin-top:14px;
+  transform:translateX(-50%);
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:99px;
+  padding:6px 13px;font-size:11px;font-weight:700;letter-spacing:.02em;
+  color:var(--faint);white-space:nowrap;pointer-events:none;box-shadow:var(--shadow-1);
+  animation:baSwipeMove 1.7s ease-in-out infinite;
+}
+.ba-slider.dragging .ba-swipe-hint,.ba-slider.interacted .ba-swipe-hint{
+  opacity:0;transition:opacity .3s ease;
+}
+@keyframes baSwipeMove{
+  0%,100%{transform:translateX(calc(-50% - 7px))}
+  50%{transform:translateX(calc(-50% + 7px))}
+}
+.ba-hint{text-align:center;font-size:12.5px;font-weight:600;color:var(--faint);margin:16px 0 0;letter-spacing:.02em}
 
 .library{position:relative}
 
@@ -520,21 +699,27 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 
 .bento-wrap{
   position:relative;isolation:isolate;overflow:hidden;
-  /* soft accent glow + subtle warm-dark gradient — feels like a studio
-     backdrop rather than flat black, fits a "creator/course" mood */
+  /* soft accent glow over the theme's own surface — studio backdrop
+     feel in dark mode, a clean neutral panel in light mode */
+  background:
+    radial-gradient(120% 120% at 18% -10%, rgba(124,58,237,.16), transparent 55%),
+    radial-gradient(90% 110% at 100% 105%, rgba(219,39,119,.08), transparent 60%),
+    var(--surface-2);
+  border:1px solid var(--line);border-radius:24px;
+  padding:clamp(14px,2.2vw,24px);
+  box-shadow:var(--shadow-1),inset 0 1px 0 rgba(var(--ink-rgb),.04);
+}
+[data-theme="dark"] .bento-wrap{
   background:
     radial-gradient(120% 120% at 18% -10%, rgba(124,58,237,.24), transparent 55%),
     radial-gradient(90% 110% at 100% 105%, rgba(219,39,119,.12), transparent 60%),
     linear-gradient(165deg,#111018 0%,#0a0a0d 45%,#0c0b12 100%);
-  border:1px solid #2b2a35;border-radius:24px;
-  padding:clamp(14px,2.2vw,24px);
-  box-shadow:var(--shadow-1),inset 0 1px 0 rgba(255,255,255,.04);
 }
 .bento-wrap::before{
   /* faint dot-grid texture, like a lightbox/blueprint — reads as
      "creator studio" rather than an empty void */
   content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
-  background-image:radial-gradient(rgba(255,255,255,.09) 1px, transparent 1.4px);
+  background-image:radial-gradient(rgba(var(--ink-rgb),.09) 1px, transparent 1.4px);
   background-size:26px 26px;
   -webkit-mask-image:radial-gradient(85% 90% at 50% 30%, #000 35%, transparent 85%);
   mask-image:radial-gradient(85% 90% at 50% 30%, #000 35%, transparent 85%);
@@ -546,13 +731,13 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
   display:flex;
   flex-direction:column;align-items:center;text-align:center;
   padding:clamp(40px,7vw,72px) 24px;
-  border:1.5px dashed #3a3a42;border-radius:18px;
-  color:#c9c9d1;
+  border:1.5px dashed var(--line-strong);border-radius:18px;
+  color:var(--body-c);
 }
 .fav-empty-icon{
   width:56px;height:56px;border-radius:50%;
   display:grid;place-items:center;margin-bottom:18px;
-  background:#1c1c22;color:#6b6b76;
+  background:var(--surface-2);color:var(--faint);
   animation:favWobble 3.2s ease-in-out infinite;
 }
 .fav-empty-icon svg{width:26px;height:26px}
@@ -564,8 +749,8 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
   32%{transform:rotate(0deg)}
 }
 @media (prefers-reduced-motion:reduce){.fav-empty-icon{animation:none}}
-.fav-empty-title{font-family:var(--font-display);font-size:19px;font-weight:700;color:#f1f1f4;margin:0 0 8px}
-.fav-empty-sub{font-size:14.5px;color:#9c9ca6;max-width:340px;margin:0 0 22px}
+.fav-empty-title{font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--ink);margin:0 0 8px}
+.fav-empty-sub{font-size:14.5px;color:var(--muted);max-width:340px;margin:0 0 22px}
 
 /* ---------- stack (swipeable rolodex) view ---------- */
 .stack-wrap{
@@ -583,12 +768,13 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
   position:absolute;top:50%;left:50%;
   width:220px;height:300px;margin:-150px 0 0 -110px;
   display:flex;flex-direction:column;overflow:hidden;
-  background:#18181b;border:1px solid #27272a;border-radius:16px;
-  padding:14px 16px 16px;color:#a1a1aa;
-  box-shadow:0 20px 45px -18px rgba(0,0,0,.6);
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  padding:14px 16px 16px;color:var(--muted);
+  box-shadow:0 20px 45px -18px rgba(0,0,0,.35);
   transition:transform .45s cubic-bezier(.16,1,.3,1),opacity .3s;
   will-change:transform;
 }
+[data-theme="dark"] .stack-card{box-shadow:0 20px 45px -18px rgba(0,0,0,.6)}
 @media (max-width:719px){.stack-card{width:172px;height:250px;margin:-125px 0 0 -86px}}
 .stack-wrap.dragging .stack-card{transition:none}
 .stack-card .card-fav{top:8px;right:8px}
@@ -638,11 +824,16 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 
 .card{
   display:flex;flex-direction:column;position:relative;overflow:hidden;
-  background:#18181b;border:1px solid #27272a;border-radius:14px;
-  padding:40px 20px 20px;color:#a1a1aa;text-decoration:none;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:40px 20px 20px;color:var(--muted);text-decoration:none;
   transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .35s,background-color .3s;
+  /* skip layout/paint/animation work for off-screen cards — the
+     biggest single win for scroll performance on a grid this size */
+  content-visibility:auto;
+  contain-intrinsic-size:0 260px;
 }
-.card:hover{border-color:#3f3f46;background:#1d1d21;box-shadow:0 25px 50px -12px rgba(0,0,0,.55);transform:scale(1.015);z-index:2}
+.card:hover{border-color:var(--line-strong);background:var(--surface-2);box-shadow:0 25px 50px -12px rgba(0,0,0,.25);transform:scale(1.015);z-index:2}
+[data-theme="dark"] .card:hover{box-shadow:0 25px 50px -12px rgba(0,0,0,.55)}
 .bs-tall:hover{transform:scale(1.02)}
 .bs-std:hover,.bs-wide:hover{transform:scale(.985)}
 .card.hide{display:none}
@@ -655,17 +846,17 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 .bento-grid .t-exercise{color:#fbbf24;background:rgba(251,191,36,.13)}
 .bento-grid .t-reference{color:#60a5fa;background:rgba(96,165,250,.15)}
 .bento-grid .t-guide{color:#f472b6;background:rgba(244,114,182,.14)}
-.card-min{font-size:11.5px;font-weight:600;color:#71717a}
+.card-min{font-size:11.5px;font-weight:600;color:var(--faint)}
 
-.card-title{font-size:17.5px;color:#fafafa;letter-spacing:-.01em;margin:0 0 5px}
-.card-desc{font-size:13.3px;color:#a1a1aa;margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #27272a;padding-top:11px;margin-top:12px}
+.card-title{font-size:17.5px;color:var(--ink);letter-spacing:-.01em;margin:0 0 5px}
+.card-desc{font-size:13.3px;color:var(--muted);margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:11px;margin-top:12px}
 .card-status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700}
 .card-status svg.ic{width:13px;height:13px}
 .st-done{color:#34d399}
 .st-active{color:#a78bfa}
-.st-todo{color:#71717a}
-.card-open{color:#52525b;display:grid;place-items:center;transition:transform .25s,color .25s}
+.st-todo{color:var(--faint)}
+.card-open{color:var(--faint);display:grid;place-items:center;transition:transform .25s,color .25s}
 .card-open svg.ic{width:15px;height:15px}
 .card:hover .card-open{color:#a78bfa;transform:translateX(4px)}
 
@@ -685,24 +876,24 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 .card-fav.is-fav svg.ic{fill:currentColor}
 .card-fav.is-fav:active svg.ic,.card-fav:active svg.ic{transform:scale(.82)}
 
-.cv-ring{position:absolute;left:50%;top:50%;width:130px;height:130px;margin:-65px 0 0 -65px;border:1.5px solid rgba(255,255,255,.15);border-radius:50%;animation:cvPulse 3.6s cubic-bezier(.16,1,.3,1) infinite;pointer-events:none}
+.cv-ring{position:absolute;left:50%;top:50%;width:130px;height:130px;margin:-65px 0 0 -65px;border:1.5px solid rgba(var(--ink-rgb),.15);border-radius:50%;animation:cvPulse 3.6s cubic-bezier(.16,1,.3,1) infinite;pointer-events:none}
 .cv-ring.d1{animation-delay:1.2s}
 .cv-ring.d2{animation-delay:2.4s}
 @keyframes cvPulse{0%{transform:scale(.55);opacity:1}70%,100%{transform:scale(1.55);opacity:0}}
 
 .cv-fstops{position:relative;display:grid;place-items:center;padding:34px 0}
-.cv-fstops b{grid-area:1/1;font-family:var(--font-display);font-weight:600;font-size:clamp(36px,4.2vw,54px);color:#fff;opacity:0;animation:fstCycle 9s infinite}
+.cv-fstops b{grid-area:1/1;font-family:var(--font-display);font-weight:600;font-size:clamp(36px,4.2vw,54px);color:var(--ink);opacity:0;animation:fstCycle 9s infinite}
 .cv-fstops b:nth-child(4){animation-delay:3s}
 .cv-fstops b:nth-child(5){animation-delay:6s}
 @keyframes fstCycle{0%,26%{opacity:1;transform:scale(1)}13%{transform:scale(1.1)}33%,100%{opacity:0;transform:scale(.96)}}
 
-.cv-thirds{position:relative;width:132px;height:92px;border-radius:10px;background:rgba(255,255,255,.03)}
-.cv-thirds i{position:absolute;background:rgba(255,255,255,.14)}
+.cv-thirds{position:relative;width:132px;height:92px;border-radius:10px;background:rgba(var(--ink-rgb),.03)}
+.cv-thirds i{position:absolute;background:rgba(var(--ink-rgb),.14)}
 .cv-thirds .v1{left:33.33%;top:0;bottom:0;width:1px}
 .cv-thirds .v2{left:66.66%;top:0;bottom:0;width:1px}
 .cv-thirds .h1{top:33.33%;left:0;right:0;height:1px}
 .cv-thirds .h2{top:66.66%;left:0;right:0;height:1px}
-.cv-dot{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.14);transform:translate(-50%,-50%);animation:thirdsTour 8s cubic-bezier(.65,0,.35,1) infinite}
+.cv-dot{position:absolute;width:12px;height:12px;border-radius:50%;background:rgb(var(--ink-rgb));box-shadow:0 0 0 5px rgba(var(--ink-rgb),.14);transform:translate(-50%,-50%);animation:thirdsTour 8s cubic-bezier(.65,0,.35,1) infinite}
 @keyframes thirdsTour{
   0%,18%{left:33.33%;top:33.33%}
   25%,43%{left:66.66%;top:33.33%}
@@ -712,11 +903,11 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 }
 
 .cv-light{position:relative;display:grid;place-items:center}
-.cv-sun{width:56px;height:56px;color:rgba(255,255,255,.88);position:relative;z-index:2}
+.cv-sun{width:56px;height:56px;color:rgba(var(--ink-rgb),.88);position:relative;z-index:2}
 
 .cv-focus{position:relative;width:96px;height:96px;display:grid;place-items:center}
 .cv-focus .frame{position:absolute;inset:0;animation:zoomPulse 2.8s cubic-bezier(.65,0,.35,1) infinite}
-.cv-focus .frame i{position:absolute;width:20px;height:20px;border:2px solid rgba(255,255,255,.75)}
+.cv-focus .frame i{position:absolute;width:20px;height:20px;border:2px solid rgba(var(--ink-rgb),.75)}
 .cv-focus .c1{top:0;left:0;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
 .cv-focus .c2{top:0;right:0;border-left:0;border-bottom:0;border-radius:0 8px 0 0}
 .cv-focus .c3{bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 8px}
@@ -726,33 +917,33 @@ section[id]{scroll-margin-top:calc(var(--topbar-h) + 16px)}
 
 .cv-quiz{position:relative;width:86px;height:86px}
 .cv-quiz .qm,.cv-quiz .ok{position:absolute;inset:0;display:grid;place-items:center;border-radius:50%}
-.cv-quiz .qm{font-family:var(--font-display);font-size:34px;font-weight:600;color:#fff;background:rgba(255,255,255,.08);animation:qmA 4.8s cubic-bezier(.65,0,.35,1) infinite}
+.cv-quiz .qm{font-family:var(--font-display);font-size:34px;font-weight:600;color:var(--ink);background:rgba(var(--ink-rgb),.08);animation:qmA 4.8s cubic-bezier(.65,0,.35,1) infinite}
 .cv-quiz .ok{color:#09090b;background:#34d399;animation:qmB 4.8s cubic-bezier(.65,0,.35,1) infinite}
 .cv-quiz .ok svg.ic{width:34px;height:34px;stroke-width:2.6}
 @keyframes qmA{0%,38%{opacity:1;transform:scale(1)}48%,90%{opacity:0;transform:scale(.7)}100%{opacity:1;transform:scale(1)}}
 @keyframes qmB{0%,38%{opacity:0;transform:scale(.7)}48%,90%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.7)}}
 
-.cv-check{width:74px;height:74px;border:1.5px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(255,255,255,.04);display:grid;place-items:center}
+.cv-check{width:74px;height:74px;border:1.5px solid rgba(var(--ink-rgb),.16);border-radius:18px;background:rgba(var(--ink-rgb),.04);display:grid;place-items:center}
 .cv-check svg{width:34px;height:34px}
 .cv-check path{fill:none;stroke:#34d399;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:26;stroke-dashoffset:26;animation:drawCheck 3.4s cubic-bezier(.65,0,.35,1) infinite}
 @keyframes drawCheck{0%{stroke-dashoffset:26}30%,72%{stroke-dashoffset:0}100%{stroke-dashoffset:26}}
 
 .cv-rows{display:flex;flex-direction:column;gap:10px;width:170px}
-.cv-rows i{height:10px;border-radius:99px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.cv-rows i{height:10px;border-radius:99px;background:rgba(var(--ink-rgb),.08);position:relative;overflow:hidden}
 .cv-rows i::after{content:"";position:absolute;inset:0;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#8b5cf6);transform:scaleX(0);transform-origin:left;animation:rowScan 4.2s cubic-bezier(.65,0,.35,1) infinite}
 .cv-rows i:nth-child(2)::after{animation-delay:.35s}
 .cv-rows i:nth-child(3)::after{animation-delay:.7s}
 @keyframes rowScan{0%{transform:scaleX(0)}12%{transform:scaleX(1)}82%{transform:scaleX(1)}94%,100%{transform:scaleX(0)}}
 
 .cv-days{display:flex;align-items:center;gap:9px}
-.cv-days i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.12);animation:dayFill 6.3s infinite}
+.cv-days i{width:11px;height:11px;border-radius:50%;background:rgba(var(--ink-rgb),.12);animation:dayFill 6.3s infinite}
 .cv-days i:nth-child(2){animation-delay:.3s}
 .cv-days i:nth-child(3){animation-delay:.6s}
 .cv-days i:nth-child(4){animation-delay:.9s}
 .cv-days i:nth-child(5){animation-delay:1.2s}
 .cv-days i:nth-child(6){animation-delay:1.5s}
 .cv-days i:nth-child(7){animation-delay:1.8s}
-@keyframes dayFill{0%{background:rgba(255,255,255,.12);box-shadow:none}6%{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.12)}88%{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.12)}100%{background:rgba(255,255,255,.12);box-shadow:none}}
+@keyframes dayFill{0%{background:rgba(var(--ink-rgb),.12);box-shadow:none}6%{background:rgb(var(--ink-rgb));box-shadow:0 0 0 4px rgba(var(--ink-rgb),.12)}88%{background:rgb(var(--ink-rgb));box-shadow:0 0 0 4px rgba(var(--ink-rgb),.12)}100%{background:rgba(var(--ink-rgb),.12);box-shadow:none}}
 
 @media (max-width:1020px){
   .bento-grid{grid-template-columns:repeat(2,1fr)}
@@ -1313,11 +1504,11 @@ body:not(.focus-mode) .back-overview{display:none}
 .creator-card{
   position:relative;overflow:hidden;
   display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(26px,4vw,52px);align-items:center;
-  background:linear-gradient(145deg,#181826,#101019 62%);
-  border:1px solid #2a2a3e;border-radius:24px;
+  background:var(--surface);
+  border:1px solid var(--line);border-radius:24px;
   padding:clamp(28px,5vw,54px);
   box-shadow:var(--shadow-2);
-  color:#c9c9d6;
+  color:var(--body-c);
   transition:transform .25s ease,box-shadow .25s ease;
 }
 .creator-card:hover{transform:translateY(-3px)}
@@ -1341,29 +1532,45 @@ body:not(.focus-mode) .back-overview{display:none}
 .creator-photo{
   position:relative;display:block;border-radius:50%;object-fit:cover;
   width:calc(100% - 12px);height:calc(100% - 12px);margin:6px;
-  border:4px solid #14141f;
+  border:4px solid var(--surface);
 }
 .creator-eyebrow{
   font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
   color:var(--accent-2);margin:0 0 10px;
 }
-.creator-name{font-size:clamp(24px,3.4vw,34px);color:#fff;letter-spacing:-.02em;margin:0 0 6px}
-.creator-title{font-size:15px;font-weight:600;color:#a9a9c2;margin:0 0 16px}
+.creator-name{font-size:clamp(24px,3.4vw,34px);color:var(--ink);letter-spacing:-.02em;margin:0 0 6px}
+.creator-title{font-size:15px;font-weight:600;color:var(--muted);margin:0 0 16px}
 .creator-note{
-  font-size:15.5px;line-height:1.75;color:#dcdce8;margin:0 0 6px;max-width:600px;
+  font-size:15.5px;line-height:1.75;color:var(--body-c);margin:0 0 6px;max-width:600px;
 }
 .creator-contact{
-  border-top:1px solid rgba(255,255,255,.09);margin-top:26px;padding-top:22px;
+  border-top:1px solid var(--line);margin-top:26px;padding-top:22px;
   display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
 }
-.creator-contact-line{font-size:14.5px;color:#c9c9d6;margin:0;max-width:360px}
-.creator-contact-line strong{color:#fff;font-weight:600}
+.creator-contact-line{font-size:14.5px;color:var(--body-c);margin:0;max-width:360px}
+.creator-contact-line strong{color:var(--ink);font-weight:600}
 .creator-btns{display:flex;gap:10px;flex-wrap:wrap}
 .btn-ondark{
-  background:transparent;color:#e9e9f2;border:1px solid #3d3d55;
+  background:transparent;color:var(--ink);border:1px solid var(--line-strong);
 }
 .btn-ondark:hover{border-color:var(--accent-2);color:var(--accent-2);transform:translateY(-2px)}
 .btn-ondark svg.ic{width:16px;height:16px}
+.btn-portfolio{background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.4);color:#7c3aed}
+.btn-portfolio:hover{background:rgba(124,58,237,.14);border-color:#7c3aed;color:#6d28d9}
+.btn-messenger{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.4);color:#2563eb}
+.btn-messenger:hover{background:rgba(37,99,235,.14);border-color:#2563eb;color:#1d4ed8}
+.btn-instagram{background:rgba(219,39,119,.08);border-color:rgba(219,39,119,.4);color:#db2777}
+.btn-instagram:hover{background:rgba(219,39,119,.14);border-color:#db2777;color:#be185d}
+.btn-email{background:rgba(21,128,61,.08);border-color:rgba(21,128,61,.4);color:#15803d}
+.btn-email:hover{background:rgba(21,128,61,.14);border-color:#15803d;color:#166534}
+[data-theme="dark"] .btn-portfolio{background:rgba(168,85,247,.14);border-color:rgba(168,85,247,.5);color:#d8b4fe}
+[data-theme="dark"] .btn-portfolio:hover{background:rgba(168,85,247,.22);border-color:#c084fc;color:#e9d5ff}
+[data-theme="dark"] .btn-messenger{background:rgba(96,165,250,.14);border-color:rgba(96,165,250,.5);color:#93c5fd}
+[data-theme="dark"] .btn-messenger:hover{background:rgba(96,165,250,.22);border-color:#60a5fa;color:#bfdbfe}
+[data-theme="dark"] .btn-instagram{background:rgba(244,114,182,.14);border-color:rgba(244,114,182,.5);color:#f9a8d4}
+[data-theme="dark"] .btn-instagram:hover{background:rgba(244,114,182,.22);border-color:#f472b6;color:#fbcfe8}
+[data-theme="dark"] .btn-email{background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.5);color:#6ee7b7}
+[data-theme="dark"] .btn-email:hover{background:rgba(52,211,153,.22);border-color:#34d399;color:#a7f3d0}
 
 @media (max-width:900px){
   .creator-card{grid-template-columns:1fr;text-align:center;justify-items:center}
@@ -1454,10 +1661,10 @@ body:not(.focus-mode) .back-overview{display:none}
   .nav-links{display:none}
 }
 @media (max-width:980px){
-  .ba-grid{grid-template-columns:1fr;gap:14px}
-  .ba-arrow{flex-direction:row;padding:2px 0;justify-content:flex-start;gap:14px}
-  .ba-arrow-circle{width:40px;height:40px}
-  .ba-arrow-circle svg.ic{width:17px;height:17px}
+  .ba-slider{min-height:640px}
+  .ba-handle{width:40px;height:40px}
+  .ba-handle svg{width:15px;height:15px}
+  .ba-tag{font-size:15px;padding:8px 14px}
   .library-head{grid-template-columns:1fr}
   .progress-panel{max-width:520px}
   .steps{grid-template-columns:1fr;gap:14px}
@@ -1487,6 +1694,7 @@ body:not(.focus-mode) .back-overview{display:none}
   .rf-link{max-width:100%;width:100%}
   .rf-link.next{margin-left:0}
   .ba-panel{padding:20px 18px}
+  .ba-slider .ba-panel{padding:68px 18px 20px}
   .file-row{font-size:12px;padding:8px 11px}
 }
 @media (max-width:720px){
@@ -1528,6 +1736,38 @@ body:not(.focus-mode) .back-overview{display:none}
 }
 @media (max-width:640px){
   .nb-btn{min-height:44px;padding:10px 15px}
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE PASS — smaller/weaker GPUs struggle with
+   many concurrent infinite CSS animations + heavy filters/shadows.
+   Below 820px: keep the visuals (final state), drop the looping
+   motion that costs a repaint every frame. Nothing here removes
+   an element or changes layout — purely animation/paint cost.
+   ============================================================ */
+@media (max-width:820px){
+  .hero-badges li,
+  .creator-photo-wrap::before,
+  .cv-ring,.cv-fstops b,.cv-dot,.cv-focus .dot,.cv-focus .frame,
+  .cv-quiz .qm,.cv-quiz .ok,.cv-check path,.cv-rows i::after,
+  .cv-days i,.fav-empty-icon,
+  .arrow-circle,.ba-arrow-circle,
+  .demo-badge,.cue-dot,.pulse-dot,.note-pulse{
+    animation:none !important;
+  }
+  /* freeze decorative pieces on their resting frame instead of a
+     random mid-cycle one now that the animation is off */
+  .cv-fstops b{opacity:0;transform:scale(1)}
+  .cv-fstops b:first-of-type{opacity:1}
+  .cv-quiz .qm{opacity:1;transform:scale(1)}
+  .cv-quiz .ok{opacity:0}
+  .cv-dot{left:33.33%;top:33.33%}
+
+  /* box-shadow / backdrop-filter transitions repaint on every
+     scroll/touch frame on mobile — drop the smoothing, keep the
+     end state via existing hover/active class changes */
+  .card,.stack-card,.btn,.nav-links a{transition:none}
+  .card:active,.stack-card:active{transform:none}
 }
 </style>
 </head>
@@ -1578,6 +1818,10 @@ body:not(.focus-mode) .back-overview{display:none}
        HERO — sell the outcome, not the technology
        ============================================================ -->
   <section class="hero landing" id="hero">
+    <div class="hero-orb o1" aria-hidden="true"></div>
+    <div class="hero-orb o2" aria-hidden="true"></div>
+    <div class="hero-orb o3" aria-hidden="true"></div>
+    <div class="hero-stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="container hero-inner">
       <p class="eyebrow"><span class="dot" aria-hidden="true"></span>For course creators with a folder full of PDFs</p>
       <h1 class="hero-title">
@@ -1595,7 +1839,7 @@ body:not(.focus-mode) .back-overview{display:none}
       </div>
 
       <div class="hero-ctas">
-        <a class="btn btn-primary btn-lg" href="#library">See the Demo
+        <a class="btn btn-demo btn-lg" href="#library">See the Demo
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
         <a class="btn btn-ghost btn-lg" href="https://m.me/Muhannad.Nightwalker11" target="_blank" rel="noopener">Message on Messenger</a>
@@ -1608,11 +1852,14 @@ body:not(.focus-mode) .back-overview{display:none}
         <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Interactive</li>
         <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Searchable</li>
         <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>No LMS required</li>
-        <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Mobile-ready</li>
-        <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>Offline</li>
+        <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Mobile/Desktop-ready</li>
+        <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>Easier Navigation</li>
+        <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Organized</li>
+        <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Saves time</li>
       </ul>
     </div>
   </section>
+
 
   <!-- ============================================================
        "NOT JUST A PRETTIER PDF" — merged benefits + comparison.
@@ -1802,26 +2049,6 @@ body:not(.focus-mode) .back-overview{display:none}
   </section>
 
   <!-- ============================================================
-       RESOURCE FULL-PAGE VIEW (hash-routed; cards open real pages)
-       ============================================================ -->
-  <section class="resource-view" id="resourceView" hidden>
-    <div class="container narrow">
-      <div class="resource-top">
-        <a class="back-link" href="#library" id="backLink">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          Back to library
-        </a>
-        <span class="resource-crumb" id="resourceCrumb"></span>
-        <button class="resource-fav" id="resourceFavBtn" type="button" aria-pressed="false" aria-label="Add to favorites" title="Add to favorites">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-          <span class="resource-fav-label">Add to favorites</span>
-        </button>
-      </div>
-      <article class="resource-body" id="resourceBody"></article>
-    </div>
-  </section>
-
-  <!-- ============================================================
        BEFORE / AFTER — make the current pain feel real
        ============================================================ -->
   <section class="section landing" id="transform">
@@ -1832,34 +2059,9 @@ body:not(.focus-mode) .back-overview{display:none}
         <p class="section-sub">The content is valuable. The format can be improved.</p>
       </div>
 
-      <div class="ba-grid">
-        <!-- BEFORE: the visitor's actual folder -->
-        <div class="ba-panel ba-before reveal">
-          <p class="ba-label before">Before — your course today</p>
-          <ul class="file-list">
-            <li class="file-row r1"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Lesson-final-v3.pdf</li>
-            <li class="file-row r2"><svg class="ic fi-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><polyline points="10 9 9 9 8 9"/></svg>notes.docx</li>
-            <li class="file-row r3"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>worksheet-final-final.pdf</li>
-            <li class="file-row r4"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Lesson-final-v3-REAL-FINAL.pdf</li>
-            <li class="file-row r5"><svg class="ic fi-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><polyline points="10 9 9 9 8 9"/></svg>quiz-bank.pdf</li>
-            <li class="file-row r6"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>slides-export-v2.pdf</li>
-          </ul>
-          <ul class="pain-tags" aria-label="Pain points">
-            <li>Hard to navigate</li>
-            <li>Hard to search</li>
-            <li>Not interactive</li>
-            <li>Easy to abandon</li>
-          </ul>
-        </div>
-
-        <div class="ba-arrow reveal" aria-hidden="true">
-          <span class="ba-arrow-circle"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-          <span class="ba-arrow-label">converted</span>
-        </div>
-
-        <!-- AFTER: clean preview of the interactive format below -->
-        <div class="ba-panel ba-after reveal" style="--d:.12s">
-          <p class="ba-label after">After — your interactive course</p>
+      <div class="ba-slider reveal" id="baSlider" role="slider" aria-label="Drag to compare the old course format with the interactive one" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-orientation="horizontal" tabindex="0">
+        <!-- AFTER: base layer, always fully visible underneath -->
+        <div class="ba-panel ba-after">
           <div class="mini-search" aria-hidden="true">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span class="ms-text">exposure</span><span class="ms-caret"></span>
@@ -1882,9 +2084,59 @@ body:not(.focus-mode) .back-overview{display:none}
             <li>Progress</li>
           </ul>
         </div>
+
+        <!-- BEFORE: top layer, clipped by drag position -->
+        <div class="ba-panel ba-before" id="baBeforePanel">
+          <ul class="file-list">
+            <li class="file-row r1"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Lesson-final-v3.pdf</li>
+            <li class="file-row r2"><svg class="ic fi-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><polyline points="10 9 9 9 8 9"/></svg>notes.docx</li>
+            <li class="file-row r3"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>worksheet-final-final.pdf</li>
+            <li class="file-row r4"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Lesson-final-v3-REAL-FINAL.pdf</li>
+            <li class="file-row r5"><svg class="ic fi-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><polyline points="10 9 9 9 8 9"/></svg>quiz-bank.pdf</li>
+            <li class="file-row r6"><svg class="ic fi-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>slides-export-v2.pdf</li>
+          </ul>
+          <ul class="pain-tags" aria-label="Pain points">
+            <li>Hard to navigate</li>
+            <li>Hard to search</li>
+            <li>Not interactive</li>
+            <li>Easy to abandon</li>
+          </ul>
+        </div>
+
+        <div class="ba-tag ba-tag-before" id="baTagBefore">Before</div>
+        <div class="ba-tag ba-tag-after" id="baTagAfter">After</div>
+
+        <div class="ba-divider" id="baDivider">
+          <div class="ba-handle">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
+            <span class="ba-swipe-hint" aria-hidden="true">‹ Swipe ›</span>
+          </div>
+        </div>
       </div>
+      <p class="ba-hint">Swipe left and right to compare</p>
     </div>
   </section>
+
+  <!-- ============================================================
+       RESOURCE FULL-PAGE VIEW (hash-routed; cards open real pages)
+       ============================================================ -->
+  <section class="resource-view" id="resourceView" hidden>
+    <div class="container narrow">
+      <div class="resource-top">
+        <a class="back-link" href="#library" id="backLink">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to library
+        </a>
+        <span class="resource-crumb" id="resourceCrumb"></span>
+        <button class="resource-fav" id="resourceFavBtn" type="button" aria-pressed="false" aria-label="Add to favorites" title="Add to favorites">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          <span class="resource-fav-label">Add to favorites</span>
+        </button>
+      </div>
+      <article class="resource-body" id="resourceBody"></article>
+    </div>
+  </section>
+
 
   <!-- ============================================================
        HOW IT WORKS — three simple steps
@@ -1938,7 +2190,7 @@ body:not(.focus-mode) .back-overview{display:none}
           </button>
             <div class="faq-a"><div class="faq-a-inner">
               <p>I take your existing course content — PDFs, worksheets, slides, documents, and other materials — and turn it into a clean, interactive learning experience.</p>
-              <p>Instead of students digging through static files, your content becomes one easy-to-navigate page with features like search, organized sections, and a mobile-friendly layout.</p>
+              <p>Instead of students digging through static files, your content becomes one easy-to-navigate page with features like search, organized sections, and a mobile-friendly layout. You can check my portfolio <a href="https://muhannadshakweer.carrd.co" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;text-decoration:underline">here</a>.</p>
             </div></div>
           </div>
 
@@ -1964,8 +2216,8 @@ body:not(.focus-mode) .back-overview{display:none}
             </div></div>
           </div>
 
-          <div class="faq-item open">
-            <button class="faq-q" aria-expanded="true">
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
             <span class="faq-num">04</span>
             <span class="faq-qt">Will this replace my LMS or course platform?</span>
             <span class="faq-plus"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
@@ -2069,6 +2321,18 @@ body:not(.focus-mode) .back-overview{display:none}
             </div></div>
           </div>
 
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false">
+            <span class="faq-num">13</span>
+            <span class="faq-qt">Can it run offline?</span>
+            <span class="faq-plus"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          </button>
+            <div class="faq-a"><div class="faq-a-inner">
+              <p>Yes. It needs an internet connection the first time, just to load the content — after that, it can run fully offline.</p>
+              <p>No hosting needed.</p>
+            </div></div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -2093,6 +2357,32 @@ body:not(.focus-mode) .back-overview{display:none}
           <p class="creator-note">I'm a web developer and interactive content specialist. I started this service because I kept seeing genuinely valuable course content trapped inside PDFs that students had to scroll and dig through.</p>
           <p class="creator-note" style="margin-top:8px"><strong>This entire page — layout, design and every interactive element — is my own work. Your course content could be given the same treatment.</strong></p>
 
+          <div class="why-work" style="margin:22px 0;padding:18px 20px;border-radius:14px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.35)">
+            <p style="margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">Why Work With Me</p>
+            <ul style="list-style:none;padding:0;margin:0;display:grid;gap:11px">
+              <li style="display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--body-c);line-height:1.55">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;width:16px;height:16px" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong style="color:var(--ink)">Quick response</strong> — I reply to messages and questions myself, no middleman, no long wait.</span>
+              </li>
+              <li style="display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--body-c);line-height:1.55">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;width:16px;height:16px" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong style="color:var(--ink)">Personal work, not an agency</strong> — I design and build everything myself from start to finish, not a team splitting up the work.</span>
+              </li>
+              <li style="display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--body-c);line-height:1.55">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;width:16px;height:16px" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong style="color:var(--ink)">This demo is proof</strong> — every detail and interaction you see on this page is my own work, and your project gets the same quality. You can also check my portfolio <a href="https://muhannadshakweer.carrd.co" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;text-decoration:underline">here</a>.</span>
+              </li>
+              <li style="display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--body-c);line-height:1.55">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;width:16px;height:16px" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong style="color:var(--ink)">Revisions until you're happy</strong> — I keep refining until you're satisfied with the final result.</span>
+              </li>
+              <li style="display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--body-c);line-height:1.55">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;width:16px;height:16px" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                <span><strong style="color:var(--ink)">Fast delivery</strong> — usually 2–3 days, depending on the length and complexity of your content.</span>
+              </li>
+            </ul>
+          </div>
+
           <div class="creator-contact">
             <p class="creator-contact-line">Got a question? <strong>Reach out directly — I read every message myself.</strong></p>
             <div class="creator-btns">
@@ -2100,15 +2390,19 @@ body:not(.focus-mode) .back-overview{display:none}
                 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.7z"/></svg>
                 Order on Fiverr — from $40
               </a>
-              <a class="btn btn-ondark btn-sm" href="https://m.me/Muhannad.Nightwalker11" target="_blank" rel="noopener">
+              <a class="btn btn-ondark btn-portfolio btn-sm" href="https://muhannadshakweer.carrd.co" target="_blank" rel="noopener">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                View My Portfolio
+              </a>
+              <a class="btn btn-ondark btn-messenger btn-sm" href="https://m.me/Muhannad.Nightwalker11" target="_blank" rel="noopener">
                 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                 Message on Messenger
               </a>
-              <a class="btn btn-ondark btn-sm" href="https://ig.me/m/muhannad_shakweer" target="_blank" rel="noopener">
+              <a class="btn btn-ondark btn-instagram btn-sm" href="https://ig.me/m/muhannad_shakweer" target="_blank" rel="noopener">
                 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 Message on Instagram
               </a>
-              <a class="btn btn-ondark btn-sm" href="mailto:mohnad.shakweer@hotmail.com">
+              <a class="btn btn-ondark btn-email btn-sm" href="mailto:mohnad.shakweer@hotmail.com">
                 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg>
                 Email me
               </a>
@@ -2128,7 +2422,7 @@ body:not(.focus-mode) .back-overview{display:none}
         <p class="eyebrow"><span class="dot" aria-hidden="true"></span>One small ask</p>
         <h2 class="section-title">See what your course could become</h2>
         <p class="cta-copy">You've seen what this format does for a photography course. One small piece of your own content is all it takes to see it for yours — as a free sample, with no commitment.</p>
-        <p class="cta-copy" style="font-weight:700;color:var(--ink)">Full project pricing starts at $40.</p>
+        <p class="cta-copy" style="font-weight:700;color:var(--ink)">Full project starts on Fiverr from $40.</p>
         <div class="cta-btns">
           <a class="btn btn-primary btn-lg" href="https://www.fiverr.com/s/WeZQRA5" target="_blank" rel="noopener">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.7-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.7 7.1-.7z"/></svg>
@@ -2144,7 +2438,7 @@ body:not(.focus-mode) .back-overview{display:none}
           </a>
         </div>
         <a class="btn btn-ghost btn-lg" href="#library" style="margin-top:4px">Back to the Demo</a>
-        <p class="cta-note">Free sample · Full project from $40 · No commitment · No rebuilding · Full project through Fiverr</p>
+        <p class="cta-note">Free sample · Full project starts on Fiverr from $40 · No commitment · No rebuilding · Full project through Fiverr</p>
       </div>
     </div>
   </section>
@@ -3679,7 +3973,7 @@ function initCardClicks(){
    the top of the page once Focus Mode hides the landing sections — the
    visitor should always land at the start of the course, not mid-page. */
 function initFocusEntryLinks(){
-  $$('.hero-ctas .btn-primary[href="#library"], .nav-links a[href="#library"]').forEach(function(a){
+  $$('.hero-ctas .btn-demo[href="#library"], .nav-links a[href="#library"]').forEach(function(a){
     a.addEventListener('click', function(){ focusEnterFromClick(); });
   });
 }
@@ -4158,7 +4452,7 @@ const revealIO = new IntersectionObserver(function(entries){
   entries.forEach(function(e){
     if(e.isIntersecting){
       e.target.classList.add('in');
-      if(e.target.classList.contains('ba-after')){
+      if(e.target.classList.contains('ba-slider')){
         const bar = $('.mp-bar i', e.target);
         if(bar) setTimeout(function(){ bar.style.width = '62%'; }, 400);
       }
@@ -4380,6 +4674,73 @@ function initBackExitGuard(){
   });
 }
 
+/* drag-to-compare slider for the BEFORE/AFTER section */
+function initBaSlider(){
+  const slider = $('#baSlider'); if(!slider) return;
+  const before = $('#baBeforePanel', slider);
+  const divider = $('#baDivider', slider);
+  const tagBefore = $('#baTagBefore', slider);
+  const tagAfter = $('#baTagAfter', slider);
+  let dragging = false;
+
+  function setPosition(pct){
+    pct = Math.max(0, Math.min(100, pct));
+    before.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
+    divider.style.left = pct + '%';
+    slider.setAttribute('aria-valuenow', Math.round(pct));
+    /* fade each tag out as its side of the comparison disappears */
+    if(tagBefore) tagBefore.style.opacity = String(pct / 100);
+    if(tagAfter) tagAfter.style.opacity = String(1 - pct / 100);
+  }
+
+  function posFromClientX(clientX){
+    const rect = slider.getBoundingClientRect();
+    const x = clientX - rect.left;
+    return (x / rect.width) * 100;
+  }
+
+  function onMove(e){
+    if(!dragging) return;
+    const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    setPosition(posFromClientX(clientX));
+    if(e.cancelable) e.preventDefault();
+  }
+  function onEnd(){
+    if(!dragging) return;
+    dragging = false;
+    slider.classList.remove('dragging');
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+  }
+  function onStart(clientX){
+    dragging = true;
+    slider.classList.add('dragging', 'interacted');
+    setPosition(posFromClientX(clientX));
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchmove', onMove, { passive:false });
+    document.addEventListener('touchend', onEnd);
+  }
+
+  slider.addEventListener('mousedown', function(e){ e.preventDefault(); onStart(e.clientX); });
+  slider.addEventListener('touchstart', function(e){
+    const t = e.touches[0]; if(t) onStart(t.clientX);
+  }, { passive:true });
+
+  /* keyboard support: arrow keys nudge the divider, Home/End jump to the ends */
+  slider.addEventListener('keydown', function(e){
+    const current = parseFloat(slider.getAttribute('aria-valuenow')) || 50;
+    if(e.key === 'ArrowLeft'){ setPosition(current - 5); slider.classList.add('interacted'); e.preventDefault(); }
+    else if(e.key === 'ArrowRight'){ setPosition(current + 5); slider.classList.add('interacted'); e.preventDefault(); }
+    else if(e.key === 'Home'){ setPosition(0); slider.classList.add('interacted'); e.preventDefault(); }
+    else if(e.key === 'End'){ setPosition(100); slider.classList.add('interacted'); e.preventDefault(); }
+  });
+
+  setPosition(50);
+}
+
 function init(){
   $('#year').textContent = new Date().getFullYear();
   initTheme();
@@ -4395,6 +4756,7 @@ function init(){
   watchReveals();
   initSearchCue();
   initMobileCta();
+  initBaSlider();
 
   window.addEventListener('hashchange', route);
   window.addEventListener('scroll', function(){
